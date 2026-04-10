@@ -6,36 +6,26 @@ st.set_page_config(page_title="ClinicMind PRO", layout="centered")
 st.title("🩺 ClinicMind PRO")
 st.subheader("Treinador de Raciocínio Clínico")
 
-# ---------------- CASOS ----------------
+# ---------------- BANCO DE CASOS ----------------
 
-casos = [
-    {
-        "nivel": "Fácil",
-        "enunciado": "Paciente com febre, tosse produtiva e dor torácica.",
-        "opcoes": ["Pneumonia", "Asma", "IAM", "Ansiedade"],
-        "correta": "Pneumonia",
-        "explicacao": "Febre + secreção indicam infecção pulmonar.",
-        "score": "CURB-65 poderia ser aplicado para avaliar gravidade."
-    },
-    {
-        "nivel": "Médio",
-        "enunciado": "Paciente com dor torácica súbita, sudorese e náusea.",
-        "opcoes": ["IAM", "Pneumonia", "Ansiedade", "DRGE"],
-        "correta": "IAM",
-        "explicacao": "Dor torácica típica com sintomas autonômicos.",
-        "score": "Escore HEART pode ser usado para estratificação."
-    },
-    {
-        "nivel": "Difícil",
-        "enunciado": "Paciente com dispneia, edema de membros inferiores e ortopneia.",
-        "opcoes": ["ICC", "Asma", "Pneumonia", "TEP"],
-        "correta": "ICC",
-        "explicacao": "Clássico quadro de insuficiência cardíaca congestiva.",
-        "score": "BNP e critérios de Framingham ajudam no diagnóstico."
-    }
-]
+casos = []
+
+# Gerando vários casos automaticamente (simulação)
+for i in range(1, 101):
+    casos.append({
+        "id": i,
+        "nivel": random.choice(["Fácil", "Médio", "Difícil"]),
+        "enunciado": f"Paciente {i} com sintomas clínicos variados (caso simulado).",
+        "opcoes": ["Diagnóstico A", "Diagnóstico B", "Diagnóstico C", "Diagnóstico D"],
+        "correta": "Diagnóstico A",
+        "explicacao": "Explicação detalhada do caso clínico com raciocínio diagnóstico.",
+        "score": "Aplicar escore clínico relevante conforme contexto."
+    })
 
 # ---------------- ESTADO ----------------
+
+if "caso_atual" not in st.session_state:
+    st.session_state.caso_atual = random.choice(casos)
 
 if "pontos" not in st.session_state:
     st.session_state.pontos = 0
@@ -46,58 +36,81 @@ if "total" not in st.session_state:
 if "erros" not in st.session_state:
     st.session_state.erros = {}
 
-# ---------------- SELEÇÃO DE CASO ----------------
+if "respondido" not in st.session_state:
+    st.session_state.respondido = False
 
-caso = random.choice(casos)
+# ---------------- MOSTRAR CASO ----------------
+
+caso = st.session_state.caso_atual
 
 st.markdown("---")
 st.write(f"**Nível:** {caso['nivel']}")
 st.write(f"**Caso:** {caso['enunciado']}")
 
-# ---------------- RESPOSTA ----------------
-
 resposta = st.radio("Escolha o diagnóstico:", caso["opcoes"])
 
-if st.button("Responder"):
+# ---------------- RESPONDER ----------------
 
-    st.session_state.total += 1
+if not st.session_state.respondido:
+    if st.button("Responder"):
 
-    if resposta == caso["correta"]:
-        st.session_state.pontos += 10
+        st.session_state.total += 1
+        st.session_state.respondido = True
 
-        st.success("✅ Correto!")
-        st.write(f"**Explicação:** {caso['explicacao']}")
-        st.info(f"📊 Score clínico: {caso['score']}")
+        if resposta == caso["correta"]:
+            st.session_state.pontos += 10
+            st.success("✅ Correto!")
+        else:
+            st.error("❌ Incorreto")
+            erro = caso["correta"]
+            st.session_state.erros[erro] = st.session_state.erros.get(erro, 0) + 1
 
+# ---------------- FEEDBACK ----------------
+
+if st.session_state.respondido:
+    st.write(f"**Resposta correta:** {caso['correta']}")
+    st.write(f"**Explicação:** {caso['explicacao']}")
+    st.info(f"📊 Score clínico: {caso['score']}")
+
+    # ---------------- CONTINUAR OU PARAR ----------------
+
+    col1, col2 = st.columns(2)
+
+    if col1.button("➡️ Próximo caso"):
+        st.session_state.caso_atual = random.choice(casos)
+        st.session_state.respondido = False
+        st.rerun()
+
+    if col2.button("⛔ Finalizar sessão"):
+        st.session_state.finalizado = True
+
+# ---------------- RESULTADO FINAL ----------------
+
+if "finalizado" in st.session_state and st.session_state.finalizado:
+
+    st.markdown("---")
+    st.header("📊 Resultado Final")
+
+    total = st.session_state.total
+    pontos = st.session_state.pontos
+
+    if total > 0:
+        acuracia = (pontos / (total * 10)) * 100
     else:
-        st.error("❌ Incorreto")
+        acuracia = 0
 
-        st.write(f"**Resposta correta:** {caso['correta']}")
-        st.write(f"**Explicação:** {caso['explicacao']}")
-        st.info(f"📊 Score clínico: {caso['score']}")
-
-        # registrar erro
-        erro = caso["correta"]
-        st.session_state.erros[erro] = st.session_state.erros.get(erro, 0) + 1
-
-# ---------------- ESTATÍSTICAS ----------------
-
-st.markdown("---")
-st.subheader("📊 Desempenho")
-
-st.write(f"Pontos: {st.session_state.pontos}")
-st.write(f"Casos respondidos: {st.session_state.total}")
-
-if st.session_state.total > 0:
-    acuracia = (st.session_state.pontos / (st.session_state.total * 10)) * 100
+    st.write(f"Casos respondidos: {total}")
+    st.write(f"Pontos: {pontos}")
     st.write(f"Acurácia: {acuracia:.1f}%")
 
-# ---------------- ERROS ----------------
+    st.subheader("❗ Principais erros")
 
-st.subheader("❗ Principais erros")
+    if st.session_state.erros:
+        for erro, freq in st.session_state.erros.items():
+            st.write(f"{erro}: {freq} erros")
+    else:
+        st.write("Sem erros 👏")
 
-if st.session_state.erros:
-    for erro, freq in st.session_state.erros.items():
-        st.write(f"{erro}: {freq} erros")
-else:
-    st.write("Sem erros ainda 👏")
+    if st.button("🔄 Reiniciar"):
+        st.session_state.clear()
+        st.rerun()
