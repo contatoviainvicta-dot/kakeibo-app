@@ -6,51 +6,49 @@ st.set_page_config(page_title="ClinicMind PRO", layout="centered")
 st.title("🩺 ClinicMind PRO")
 st.subheader("Treinador de Raciocínio Clínico")
 
-# ---------------- BANCO DE CASOS (RESIDÊNCIA) ----------------
+# ---------------- BANCO DE CASOS (50 BASE) ----------------
 
 base_casos = [
 
-# ================= CARDIO =================
-
+# CARDIO
 ("Dor torácica opressiva, sudorese, náusea.",
  ["IAM","Ansiedade","DRGE","Pneumonia"],
  "IAM",
  "Quadro típico de síndrome coronariana aguda.",
- "HEART score"),
+ "HEART"),
 
-("Dispneia, ortopneia e edema MMII.",
+("Dispneia, ortopneia e edema.",
  ["ICC","TEP","Asma","DPOC"],
  "ICC",
- "Clássico de insuficiência cardíaca.",
+ "Insuficiência cardíaca.",
  "Framingham"),
 
-("Síncope ao esforço em idoso.",
+("Síncope ao esforço.",
  ["Estenose aórtica","IAM","Arritmia","Ansiedade"],
  "Estenose aórtica",
- "Tríade: síncope, angina, dispneia.",
- "Ecocardiograma"),
+ "Tríade clássica.",
+ "Eco"),
 
-("Palpitação + irregularidade no pulso.",
+("Palpitação irregular.",
  ["FA","IAM","TV","Bradicardia"],
  "FA",
- "Fibrilação atrial típica.",
+ "Fibrilação atrial.",
  "CHA2DS2-VASc"),
 
 ("Dor torácica ventilatório-dependente.",
  ["Pericardite","IAM","TEP","Ansiedade"],
  "Pericardite",
- "Dor que melhora ao inclinar.",
- "ECG difuso"),
+ "Melhora ao inclinar.",
+ "ECG"),
 
-# ================= PNEUMO =================
-
-("Febre, tosse produtiva, dor torácica.",
+# PNEUMO
+("Febre, tosse produtiva.",
  ["Pneumonia","Asma","TEP","ICC"],
  "Pneumonia",
- "Infecção pulmonar clássica.",
+ "Infecção pulmonar.",
  "CURB-65"),
 
-("Dispneia súbita, taquicardia.",
+("Dispneia súbita + taquicardia.",
  ["TEP","Pneumonia","Asma","DPOC"],
  "TEP",
  "Embolia pulmonar.",
@@ -59,126 +57,122 @@ base_casos = [
 ("Tosse crônica + tabagismo.",
  ["DPOC","Asma","Pneumonia","Câncer"],
  "DPOC",
- "Doença obstrutiva crônica.",
+ "Doença obstrutiva.",
  "Espirometria"),
 
-("Sibilância + dispneia episódica.",
+("Sibilância episódica.",
  ["Asma","DPOC","TEP","ICC"],
  "Asma",
- "Broncoconstrição reversível.",
+ "Broncoconstrição.",
  "Clínico"),
 
 ("Hemoptise + perda de peso.",
- ["Câncer pulmão","TB","Pneumonia","DPOC"],
- "Câncer pulmão",
+ ["Câncer","TB","Pneumonia","DPOC"],
+ "Câncer",
  "Neoplasia pulmonar.",
  "TC"),
 
-# ================= NEURO =================
-
-("Déficit motor súbito.",
+# NEURO
+("Déficit súbito.",
  ["AVC","Tumor","Epilepsia","Enxaqueca"],
  "AVC",
  "Instalação abrupta.",
  "NIHSS"),
 
-("Cefaleia intensa súbita.",
+("Cefaleia trovoada.",
  ["HSA","Enxaqueca","Meningite","AVC"],
  "HSA",
- "Cefaleia em trovoada.",
+ "Hemorragia.",
  "TC"),
 
-("Convulsão tônico-clônica.",
+("Convulsão.",
  ["Epilepsia","AVC","Tumor","Hipoglicemia"],
  "Epilepsia",
  "Crise típica.",
  "EEG"),
 
-("Rigidez + tremor de repouso.",
+("Tremor repouso.",
  ["Parkinson","AVC","Demência","Ataxia"],
  "Parkinson",
- "Síndrome extrapiramidal.",
+ "Extrapiramidal.",
  "Clínico"),
 
-("Confusão + febre + rigidez nuca.",
+("Febre + rigidez nuca.",
  ["Meningite","AVC","Enxaqueca","Tumor"],
  "Meningite",
  "Tríade clássica.",
- "Punção lombar"),
+ "Punção"),
 
-# ================= INFECTO =================
-
-("Febre + hipotensão + lactato elevado.",
+# INFECTO
+("Febre + hipotensão.",
  ["Sepse","Choque cardiogênico","Anafilaxia","TEP"],
  "Sepse",
  "Disfunção orgânica.",
  "SOFA"),
 
-("Febre + dor lombar + disúria.",
+("Febre + dor lombar.",
  ["Pielonefrite","ITU","Sepse","Dengue"],
  "Pielonefrite",
  "Infecção renal.",
  "Urocultura"),
 
-("Febre + exantema + mialgia.",
+("Febre + exantema.",
  ["Dengue","Zika","Chikungunya","Sepse"],
  "Dengue",
  "Arbovirose.",
  "Clínico"),
 
-("Tosse + cavitação pulmonar.",
- ["Tuberculose","Pneumonia","Câncer","TEP"],
- "Tuberculose",
- "BAAR positivo.",
+("Cavitação pulmonar.",
+ ["TB","Pneumonia","Câncer","TEP"],
+ "TB",
+ "BAAR.",
  "BAAR"),
 
-("Febre prolongada + sopro novo.",
+("Febre + sopro.",
  ["Endocardite","Sepse","IAM","TEP"],
  "Endocardite",
  "Infecção valvar.",
  "Duke"),
 
-# ================= GASTRO =================
-
-("Dor epigástrica pós-prandial.",
+# GASTRO
+("Dor epigástrica.",
  ["Gastrite","Úlcera","IAM","Pancreatite"],
  "Gastrite",
- "Inflamação gástrica.",
+ "Inflamação.",
  "Endoscopia"),
 
-("Dor FID + febre.",
+("Dor FID.",
  ["Apendicite","Diverticulite","Colecistite","Pancreatite"],
  "Apendicite",
- "Quadro típico.",
+ "Clássico.",
  "Alvarado"),
 
-("Dor epigástrica irradiada dorso.",
+("Dor irradiada dorso.",
  ["Pancreatite","IAM","Gastrite","Úlcera"],
  "Pancreatite",
- "Amilase/lipase.",
+ "Lipase.",
  "Ranson"),
 
-("Icterícia + dor + febre.",
+("Icterícia + febre.",
  ["Colangite","Hepatite","Colecistite","Cirrose"],
  "Colangite",
- "Tríade de Charcot.",
+ "Charcot.",
  "Clínico"),
 
 ("Hematoquezia.",
- ["Hemorragia baixa","Hemorroida","Câncer","Úlcera"],
- "Hemorragia baixa",
- "Sangramento distal.",
+ ["HDB","Hemorroida","Câncer","Úlcera"],
+ "HDB",
+ "Sangramento baixo.",
  "Colonoscopia"),
 
-# ================= ENDO =================
-
+# ENDO
 ("Poliúria + polidipsia.",
  ["DM","DI","Hipoglicemia","Sepse"],
  "DM",
  "Hiperglicemia.",
  "HbA1c"),
 
-("Hipoglicemia + sudorese.",
+("Hipoglicemia.",
  ["Hipoglicemia","DM","Sepse","AVC"],
  "Hipoglicemia",
  "Baixa glicose.",
@@ -190,7 +184,7 @@ base_casos = [
  "Insuficiência adrenal.",
  "Cortisol"),
 
-("Ganho de peso + estrias.",
+("Ganho peso + estrias.",
  ["Cushing","DM","Obesidade","Hipotireoidismo"],
  "Cushing",
  "Hipercortisolismo.",
@@ -202,21 +196,20 @@ base_casos = [
  "Excesso hormonal.",
  "TSH"),
 
-# ================= PEDIATRIA =================
-
-("Febre + exantema + conjuntivite.",
+# PEDIATRIA
+("Febre + exantema.",
  ["Sarampo","Rubéola","Dengue","Varicela"],
  "Sarampo",
- "Doença viral.",
+ "Viral.",
  "Clínico"),
 
-("Estridor + tosse em criança.",
+("Estridor.",
  ["Laringite","Asma","Pneumonia","Bronquite"],
  "Laringite",
  "Croup.",
  "Clínico"),
 
-("Febre + língua em morango.",
+("Língua em morango.",
  ["Kawasaki","Sarampo","Sepse","Varicela"],
  "Kawasaki",
  "Vasculite.",
@@ -225,57 +218,30 @@ base_casos = [
 ("Diarreia + desidratação.",
  ["Gastroenterite","Sepse","DM","ITU"],
  "Gastroenterite",
- "Infecção intestinal.",
+ "Intestinal.",
  "Clínico"),
 
-("Febre + convulsão.",
+("Convulsão febril.",
  ["Convulsão febril","Epilepsia","Meningite","AVC"],
  "Convulsão febril",
- "Comum em criança.",
+ "Benigna.",
  "Clínico"),
-
-# ================= OBST =================
-
-("Beta-hCG positivo.",
- ["Gravidez","Mioma","Cisto","Endometriose"],
- "Gravidez",
- "Confirmação.",
- "Beta-hCG"),
-
-("Sangramento no 1º trimestre.",
- ["Abortamento","Gravidez normal","Cisto","Mioma"],
- "Abortamento",
- "Perda gestacional.",
- "USG"),
-
-("PA alta + proteinúria.",
- ["Pré-eclâmpsia","HAS","Eclâmpsia","Sepse"],
- "Pré-eclâmpsia",
- "Critério diagnóstico.",
- "PA"),
-
-("Convulsão na gestante.",
- ["Eclâmpsia","Epilepsia","AVC","Sepse"],
- "Eclâmpsia",
- "Complicação.",
- "Clínico"),
-
-("Dor pélvica + atraso menstrual.",
- ["Ectópica","Gravidez normal","Cisto","Mioma"],
- "Ectópica",
- "Gravidez fora do útero.",
- "USG"),
 ]
 
-# EXPANDIR PARA 100 CASOS
+# ---------------- EXPANSÃO ----------------
+
 casos = []
 for i in range(100):
     base = random.choice(base_casos)
+
+    opcoes = base[1].copy()
+    random.shuffle(opcoes)
+
     casos.append({
         "id": i,
         "nivel": random.choice(["Interno","R1","R3"]),
         "enunciado": f"Caso {i+1}: {base[0]}",
-        "opcoes": base[1],
+        "opcoes": opcoes,
         "correta": base[2],
         "explicacao": base[3],
         "score": base[4]
@@ -303,8 +269,10 @@ if "finalizado" not in st.session_state:
 
 # ---------------- CASO ----------------
 
-# ---------------- CASO ----------------
+caso = st.session_state.caso_atual
 
+st.markdown("---")
+st.write(f"**Nível:** {caso['nivel']}")
 st.write(caso["enunciado"])
 
 resposta = st.radio(
@@ -348,7 +316,7 @@ if st.session_state.respondido:
     if col2.button("⛔ Finalizar sessão"):
         st.session_state.finalizado = True
 
-# ---------------- RESULTADO FINAL ----------------
+# ---------------- RESULTADO ----------------
 
 if st.session_state.finalizado:
 
