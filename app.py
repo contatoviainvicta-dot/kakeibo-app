@@ -3,9 +3,17 @@ import random
 
 st.set_page_config(page_title="ClinicMind PRO", layout="centered")
 
-st.title("🩺 ClinicMind PRO")
-st.subheader("Treinador de Raciocínio Clínico")
+st.markdown("""
+# 🩺 ClinicMind PRO  
+### 🧠 Treinador de Raciocínio Clínico
+""")
+# ---------------- PROGRESSO ----------------
 
+if st.session_state.total > 0:
+    progresso = st.session_state.total / 20
+    st.progress(min(progresso, 1.0))
+    st.caption(f"📈 Progresso: {st.session_state.total} casos respondidos")
+ 
 # ---------------- BANCO DE CASOS (50 BASE) ----------------
 
 base_casos = [
