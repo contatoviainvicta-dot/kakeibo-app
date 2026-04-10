@@ -303,13 +303,23 @@ if "finalizado" not in st.session_state:
 
 # ---------------- CASO ----------------
 
-caso = st.session_state.caso_atual
+casos = []
 
-st.markdown("---")
-st.write(f"**Nível:** {caso['nivel']}")
-st.write(caso["enunciado"])
+for i in range(100):
+    base = random.choice(base_casos)
 
-resposta = st.radio("Qual o diagnóstico mais provável?", caso["opcoes"])
+    opcoes = base[1].copy()
+    random.shuffle(opcoes)
+
+    casos.append({
+        "id": i,
+        "nivel": random.choice(["Interno","R1","R3"]),
+        "enunciado": f"Caso {i+1}: {base[0]}",
+        "opcoes": opcoes,
+        "correta": base[2],
+        "explicacao": base[3],
+        "score": base[4]
+    })
 
 # ---------------- RESPONDER ----------------
 
