@@ -3,8 +3,10 @@ import sqlite3
 import pandas as pd
 from datetime import datetime
 
-# ---------------- BANCO ----------------
+# ---------------- CONFIG ----------------
+st.set_page_config(page_title="Kakeibo PRO", layout="wide")
 
+# ---------------- BANCO ----------------
 conn = sqlite3.connect("kakeibo.db", check_same_thread=False)
 cursor = conn.cursor()
 
@@ -28,14 +30,13 @@ CREATE TABLE IF NOT EXISTS categorias (
 
 conn.commit()
 
-# Inserir categorias padrão
+# Categorias padrão
 categorias_padrao = ["sobrevivencia", "opcional", "cultura", "extra"]
 for cat in categorias_padrao:
     cursor.execute("INSERT OR IGNORE INTO categorias (nome) VALUES (?)", (cat,))
 conn.commit()
 
 # ---------------- FUNÇÕES ----------------
-
 def get_categorias():
     cursor.execute("SELECT nome FROM categorias")
     return [x[0] for x in cursor.fetchall()]
@@ -58,9 +59,6 @@ def get_transacoes():
     return pd.read_sql_query("SELECT * FROM transacoes", conn)
 
 # ---------------- UI ----------------
-
-st.set_page_config(page_title="Kakeibo PRO", layout="wide")
-
 st.title("💰 Kakeibo PRO")
 
 abas = st.tabs(["📊 Dashboard", "➕ Nova Transação", "⚙️ Categorias"])
@@ -68,8 +66,7 @@ abas = st.tabs(["📊 Dashboard", "➕ Nova Transação", "⚙️ Categorias"])
 df = get_transacoes()
 categorias = get_categorias()
 
-# ---------------- DASHBOARD ----------------
-
+# ================= DASHBOARD =================
 with abas[0]:
     st.header("Visão Geral")
 
@@ -91,40 +88,67 @@ with abas[0]:
         col1.metric("Receitas", f"R$ {receitas:.2f}")
         col2.metric("Despesas", f"R$ {despesas:.2f}")
         col3.metric("Saldo", f"R$ {saldo:.2f}")
-# ---------------- SAÚDE FINANCEIRA ----------------
 
-st.subheader("Saúde Financeira")
+        # -------- SAÚDE FINANCEIRA --------
+        st.subheader("Saúde Financeira")
 
-if receitas == 0:
-    st.info("Sem receitas registradas")
-else:
-    taxa = (despesas / receitas) * 100
+        if receitas == 0:
+            st.info("Sem receitas registradas")
+        else:
+            taxa = (despesas / receitas) * 100
+            st.write(f"Você gastou {taxa:.1f}% da sua renda")
 
-    st.write(f"Você gastou {taxa:.1f}% da sua renda")
+            if taxa < 50:
+                st.success("Excelente controle financeiro")
+            elif taxa < 80:
+                st.warning("Atenção: gastos moderados")
+            else:
+                st.error("Risco financeiro alto")
 
-    if taxa < 50:
-        st.success("Excelente controle financeiro")
-    elif taxa < 80:
-        st.warning("Atenção: gastos moderados")
-    else:
-        st.error("Risco financeiro alto")
+        # -------- PREVISÃO --------
+        st.subheader("Previsão do mês")
+
+        dias_mes = 30
+        dias_passados = datetime.now().day
+
+        if dias_passados > 0:
+            gasto_medio = despesas / dias_passados
+            previsao = gasto_medio * dias_mes
+
+            st.write(f"Gasto projetado: R$ {previsao:.2f}")
+
+            if previsao > receitas:
+                st.error("⚠️ Você vai fechar o mês no prejuízo")
+            else:
+                st.success("Você deve fechar o mês positivo")
+
+        # -------- GRÁFICO --------
         st.subheader("Gastos por categoria")
         cat = df_mes[df_mes["tipo"] == "Despesa"].groupby("categoria")["valor"].sum()
         st.bar_chart(cat)
 
+        # -------- DISTRIBUIÇÃO --------
+        st.subheader("Distribuição dos gastos (%)")
+
+        if not cat.empty:
+            total = cat.sum()
+            for categoria, valor in cat.items():
+                porcentagem = (valor / total) * 100
+                st.write(f"{categoria}: {porcentagem:.1f}%")
+
+        # -------- TABELA --------
         st.subheader("Transações")
         st.dataframe(df_mes.sort_values("data", ascending=False))
 
     else:
         st.info("Nenhuma transação ainda.")
 
-# ---------------- NOVA TRANSAÇÃO ----------------
-
+# ================= NOVA TRANSAÇÃO =================
 with abas[1]:
     st.header("Adicionar Transação")
 
     tipo = st.selectbox("Tipo", ["Receita", "Despesa"])
-    valor = st.number_input("Valor", min_value=0.0, step=1.0)
+    valor = st.number_input("Valor", min_value=0.0)
     categoria = st.selectbox("Categoria", categorias)
     descricao = st.text_input("Descrição")
     data = st.date_input("Data")
@@ -133,8 +157,7 @@ with abas[1]:
         add_transacao(tipo, valor, categoria, descricao, str(data))
         st.success("Transação salva com sucesso!")
 
-# ---------------- CATEGORIAS ----------------
-
+# ================= CATEGORIAS =================
 with abas[2]:
     st.header("Gerenciar Categorias")
 
@@ -147,3 +170,4 @@ with abas[2]:
 
     st.write("Categorias atuais:")
     st.write(categorias)
+    
