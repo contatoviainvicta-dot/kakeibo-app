@@ -91,7 +91,23 @@ with abas[0]:
         col1.metric("Receitas", f"R$ {receitas:.2f}")
         col2.metric("Despesas", f"R$ {despesas:.2f}")
         col3.metric("Saldo", f"R$ {saldo:.2f}")
+# ---------------- SAÚDE FINANCEIRA ----------------
 
+st.subheader("Saúde Financeira")
+
+if receitas == 0:
+    st.info("Sem receitas registradas")
+else:
+    taxa = (despesas / receitas) * 100
+
+    st.write(f"Você gastou {taxa:.1f}% da sua renda")
+
+    if taxa < 50:
+        st.success("Excelente controle financeiro")
+    elif taxa < 80:
+        st.warning("Atenção: gastos moderados")
+    else:
+        st.error("Risco financeiro alto")
         st.subheader("Gastos por categoria")
         cat = df_mes[df_mes["tipo"] == "Despesa"].groupby("categoria")["valor"].sum()
         st.bar_chart(cat)
