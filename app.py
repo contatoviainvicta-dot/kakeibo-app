@@ -303,23 +303,15 @@ if "finalizado" not in st.session_state:
 
 # ---------------- CASO ----------------
 
-casos = []
+# ---------------- CASO ----------------
 
-for i in range(100):
-    base = random.choice(base_casos)
+st.write(caso["enunciado"])
 
-    opcoes = base[1].copy()
-    random.shuffle(opcoes)
-
-    casos.append({
-        "id": i,
-        "nivel": random.choice(["Interno","R1","R3"]),
-        "enunciado": f"Caso {i+1}: {base[0]}",
-        "opcoes": opcoes,
-        "correta": base[2],
-        "explicacao": base[3],
-        "score": base[4]
-    })
+resposta = st.radio(
+    "Qual o diagnóstico mais provável?",
+    caso["opcoes"],
+    key="resposta_radio"
+)
 
 # ---------------- RESPONDER ----------------
 
@@ -328,6 +320,8 @@ if not st.session_state.respondido:
 
         st.session_state.total += 1
         st.session_state.respondido = True
+
+        resposta = st.session_state.resposta_radio
 
         if resposta == caso["correta"]:
             st.session_state.pontos += 10
