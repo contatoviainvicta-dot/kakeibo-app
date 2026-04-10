@@ -10,97 +10,261 @@ st.subheader("Treinador de Raciocínio Clínico")
 
 base_casos = [
 
-# CARDIO
-("Paciente com dor torácica, ECG com supra ST em D2, D3 e aVF.",
- ["IAM inferior","Pericardite","TEP","Angina estável"],
- "IAM inferior",
- "Supra em derivações inferiores indica infarto inferior.",
- "HEART + ECG + troponina"),
+# ================= CARDIO =================
 
-("Dispneia + BNP elevado + ortopneia.",
- ["ICC descompensada","TEP","Asma","Pneumonia"],
- "ICC descompensada",
- "BNP elevado indica sobrecarga cardíaca.",
+("Dor torácica opressiva, sudorese, náusea.",
+ ["IAM","Ansiedade","DRGE","Pneumonia"],
+ "IAM",
+ "Quadro típico de síndrome coronariana aguda.",
+ "HEART score"),
+
+("Dispneia, ortopneia e edema MMII.",
+ ["ICC","TEP","Asma","DPOC"],
+ "ICC",
+ "Clássico de insuficiência cardíaca.",
  "Framingham"),
 
-# PNEUMO
-("Dispneia súbita + hipoxemia + taquicardia.",
- ["TEP","Pneumonia","DPOC","Asma"],
+("Síncope ao esforço em idoso.",
+ ["Estenose aórtica","IAM","Arritmia","Ansiedade"],
+ "Estenose aórtica",
+ "Tríade: síncope, angina, dispneia.",
+ "Ecocardiograma"),
+
+("Palpitação + irregularidade no pulso.",
+ ["FA","IAM","TV","Bradicardia"],
+ "FA",
+ "Fibrilação atrial típica.",
+ "CHA2DS2-VASc"),
+
+("Dor torácica ventilatório-dependente.",
+ ["Pericardite","IAM","TEP","Ansiedade"],
+ "Pericardite",
+ "Dor que melhora ao inclinar.",
+ "ECG difuso"),
+
+# ================= PNEUMO =================
+
+("Febre, tosse produtiva, dor torácica.",
+ ["Pneumonia","Asma","TEP","ICC"],
+ "Pneumonia",
+ "Infecção pulmonar clássica.",
+ "CURB-65"),
+
+("Dispneia súbita, taquicardia.",
+ ["TEP","Pneumonia","Asma","DPOC"],
  "TEP",
- "Quadro típico de embolia pulmonar.",
+ "Embolia pulmonar.",
  "Wells"),
 
-("Tabagista com perda de peso + hemoptise.",
- ["Câncer de pulmão","DPOC","Pneumonia","Tuberculose"],
- "Câncer de pulmão",
- "Sinais clássicos de neoplasia pulmonar.",
- "TC de tórax"),
+("Tosse crônica + tabagismo.",
+ ["DPOC","Asma","Pneumonia","Câncer"],
+ "DPOC",
+ "Doença obstrutiva crônica.",
+ "Espirometria"),
 
-# NEURO
-("Déficit neurológico súbito com menos de 4h de evolução.",
- ["AVC isquêmico","AVC hemorrágico","Crise epiléptica","Tumor"],
- "AVC isquêmico",
- "Janela terapêutica para trombólise.",
+("Sibilância + dispneia episódica.",
+ ["Asma","DPOC","TEP","ICC"],
+ "Asma",
+ "Broncoconstrição reversível.",
+ "Clínico"),
+
+("Hemoptise + perda de peso.",
+ ["Câncer pulmão","TB","Pneumonia","DPOC"],
+ "Câncer pulmão",
+ "Neoplasia pulmonar.",
+ "TC"),
+
+# ================= NEURO =================
+
+("Déficit motor súbito.",
+ ["AVC","Tumor","Epilepsia","Enxaqueca"],
+ "AVC",
+ "Instalação abrupta.",
  "NIHSS"),
 
-("Cefaleia súbita intensa + rigidez de nuca.",
- ["HSA","Meningite","AVC","Enxaqueca"],
+("Cefaleia intensa súbita.",
+ ["HSA","Enxaqueca","Meningite","AVC"],
  "HSA",
- "Cefaleia em trovoada + meningismo.",
- "TC sem contraste"),
+ "Cefaleia em trovoada.",
+ "TC"),
 
-# INFECTO
+("Convulsão tônico-clônica.",
+ ["Epilepsia","AVC","Tumor","Hipoglicemia"],
+ "Epilepsia",
+ "Crise típica.",
+ "EEG"),
+
+("Rigidez + tremor de repouso.",
+ ["Parkinson","AVC","Demência","Ataxia"],
+ "Parkinson",
+ "Síndrome extrapiramidal.",
+ "Clínico"),
+
+("Confusão + febre + rigidez nuca.",
+ ["Meningite","AVC","Enxaqueca","Tumor"],
+ "Meningite",
+ "Tríade clássica.",
+ "Punção lombar"),
+
+# ================= INFECTO =================
+
 ("Febre + hipotensão + lactato elevado.",
  ["Sepse","Choque cardiogênico","Anafilaxia","TEP"],
  "Sepse",
- "Disfunção orgânica por infecção.",
+ "Disfunção orgânica.",
  "SOFA"),
 
-("Febre + tosse + cavitação pulmonar.",
+("Febre + dor lombar + disúria.",
+ ["Pielonefrite","ITU","Sepse","Dengue"],
+ "Pielonefrite",
+ "Infecção renal.",
+ "Urocultura"),
+
+("Febre + exantema + mialgia.",
+ ["Dengue","Zika","Chikungunya","Sepse"],
+ "Dengue",
+ "Arbovirose.",
+ "Clínico"),
+
+("Tosse + cavitação pulmonar.",
  ["Tuberculose","Pneumonia","Câncer","TEP"],
  "Tuberculose",
- "Cavitação pulmonar típica.",
+ "BAAR positivo.",
  "BAAR"),
 
-# GASTRO
-("Dor em fossa ilíaca direita + sinal de Blumberg.",
- ["Apendicite","Colecistite","Pancreatite","Diverticulite"],
+("Febre prolongada + sopro novo.",
+ ["Endocardite","Sepse","IAM","TEP"],
+ "Endocardite",
+ "Infecção valvar.",
+ "Duke"),
+
+# ================= GASTRO =================
+
+("Dor epigástrica pós-prandial.",
+ ["Gastrite","Úlcera","IAM","Pancreatite"],
+ "Gastrite",
+ "Inflamação gástrica.",
+ "Endoscopia"),
+
+("Dor FID + febre.",
+ ["Apendicite","Diverticulite","Colecistite","Pancreatite"],
  "Apendicite",
- "Sinal clássico de irritação peritoneal.",
+ "Quadro típico.",
  "Alvarado"),
 
-("Dor epigástrica irradiada para dorso + lipase elevada.",
+("Dor epigástrica irradiada dorso.",
  ["Pancreatite","IAM","Gastrite","Úlcera"],
  "Pancreatite",
- "Lipase elevada confirma pancreatite.",
+ "Amilase/lipase.",
  "Ranson"),
 
-# ENDO
-("Hipotensão + hiponatremia + hipercalemia.",
- ["Addison","Cushing","DM","SIADH"],
+("Icterícia + dor + febre.",
+ ["Colangite","Hepatite","Colecistite","Cirrose"],
+ "Colangite",
+ "Tríade de Charcot.",
+ "Clínico"),
+
+("Hematoquezia.",
+ ["Hemorragia baixa","Hemorroida","Câncer","Úlcera"],
+ "Hemorragia baixa",
+ "Sangramento distal.",
+ "Colonoscopia"),
+
+# ================= ENDO =================
+
+("Poliúria + polidipsia.",
+ ["DM","DI","Hipoglicemia","Sepse"],
+ "DM",
+ "Hiperglicemia.",
+ "HbA1c"),
+
+("Hipoglicemia + sudorese.",
+ ["Hipoglicemia","DM","Sepse","AVC"],
+ "Hipoglicemia",
+ "Baixa glicose.",
+ "Glicemia"),
+
+("Hipotensão + hipercalemia.",
+ ["Addison","Cushing","SIADH","DM"],
  "Addison",
  "Insuficiência adrenal.",
  "Cortisol"),
 
-("Hiperglicemia + cetose + acidose.",
- ["Cetoacidose diabética","Estado hiperosmolar","Sepse","AVC"],
- "Cetoacidose diabética",
- "Tríade clássica.",
- "Gasometria"),
+("Ganho de peso + estrias.",
+ ["Cushing","DM","Obesidade","Hipotireoidismo"],
+ "Cushing",
+ "Hipercortisolismo.",
+ "Cortisol"),
 
-# OBST
-("Gestante com PA elevada + proteinúria.",
- ["Pré-eclâmpsia","Eclâmpsia","HAS","Sepse"],
- "Pré-eclâmpsia",
- "Critérios diagnósticos clássicos.",
- "PA + proteína"),
+("Perda peso + taquicardia.",
+ ["Hipertireoidismo","DM","Ansiedade","ICC"],
+ "Hipertireoidismo",
+ "Excesso hormonal.",
+ "TSH"),
 
-# PEDIATRIA
-("Febre + descamação de extremidades + língua em morango.",
- ["Kawasaki","Sarampo","Rubéola","Varicela"],
+# ================= PEDIATRIA =================
+
+("Febre + exantema + conjuntivite.",
+ ["Sarampo","Rubéola","Dengue","Varicela"],
+ "Sarampo",
+ "Doença viral.",
+ "Clínico"),
+
+("Estridor + tosse em criança.",
+ ["Laringite","Asma","Pneumonia","Bronquite"],
+ "Laringite",
+ "Croup.",
+ "Clínico"),
+
+("Febre + língua em morango.",
+ ["Kawasaki","Sarampo","Sepse","Varicela"],
  "Kawasaki",
- "Vasculite pediátrica.",
- "Critérios clínicos"),
+ "Vasculite.",
+ "Clínico"),
+
+("Diarreia + desidratação.",
+ ["Gastroenterite","Sepse","DM","ITU"],
+ "Gastroenterite",
+ "Infecção intestinal.",
+ "Clínico"),
+
+("Febre + convulsão.",
+ ["Convulsão febril","Epilepsia","Meningite","AVC"],
+ "Convulsão febril",
+ "Comum em criança.",
+ "Clínico"),
+
+# ================= OBST =================
+
+("Beta-hCG positivo.",
+ ["Gravidez","Mioma","Cisto","Endometriose"],
+ "Gravidez",
+ "Confirmação.",
+ "Beta-hCG"),
+
+("Sangramento no 1º trimestre.",
+ ["Abortamento","Gravidez normal","Cisto","Mioma"],
+ "Abortamento",
+ "Perda gestacional.",
+ "USG"),
+
+("PA alta + proteinúria.",
+ ["Pré-eclâmpsia","HAS","Eclâmpsia","Sepse"],
+ "Pré-eclâmpsia",
+ "Critério diagnóstico.",
+ "PA"),
+
+("Convulsão na gestante.",
+ ["Eclâmpsia","Epilepsia","AVC","Sepse"],
+ "Eclâmpsia",
+ "Complicação.",
+ "Clínico"),
+
+("Dor pélvica + atraso menstrual.",
+ ["Ectópica","Gravidez normal","Cisto","Mioma"],
+ "Ectópica",
+ "Gravidez fora do útero.",
+ "USG"),
 ]
 
 # EXPANDIR PARA 100 CASOS
