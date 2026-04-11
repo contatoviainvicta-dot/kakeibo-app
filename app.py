@@ -4,10 +4,14 @@ import random
 st.set_page_config(page_title="ClinicMind PRO", layout="centered")
 
 st.markdown("""
+# 🩺 Escola Superior de Ciencias da Saude
+### 🧠 Rodizio: clinica medica
+""")
+
+st.markdown("""
 # 🩺 ClinicMind PRO  
 ### 🧠 Treinador de Raciocínio Clínico
 """)
-
 # ---------------- BANCO DE CASOS ----------------
 
 base_casos = [
