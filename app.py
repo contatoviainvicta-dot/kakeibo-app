@@ -23,24 +23,21 @@ with open("users.yaml") as file:
 # CADASTRO DE USUÁRIO
 # ----------------------------------------------------
 
-st.sidebar.subheader("🆕 Criar conta")
-
-novo_user = st.sidebar.text_input("Novo usuário")
-novo_nome = st.sidebar.text_input("Nome completo")
-nova_senha = st.sidebar.text_input("Senha", type="password")
-
 if st.sidebar.button("Cadastrar"):
     if novo_user and nova_senha:
         if novo_user in config["credentials"]["usernames"]:
             st.sidebar.error("Usuário já existe")
         else:
-            hashed = stauth.Hasher([nova_senha]).generate()[0]
+            hashed = stauth.Authenticate.hash_password(nova_senha)
+
             config["credentials"]["usernames"][novo_user] = {
                 "name": novo_nome,
                 "password": hashed
             }
+
             with open("users.yaml", "w") as file:
                 yaml.dump(config, file)
+
             st.sidebar.success("Conta criada! Faça login.")
     else:
         st.sidebar.warning("Preencha todos os campos")
