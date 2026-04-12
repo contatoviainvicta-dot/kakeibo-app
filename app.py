@@ -5,7 +5,6 @@ import os
 import yaml
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
-from streamlit_authenticator import Hasher
 
 # ----------------------------------------------------
 # CONFIG
@@ -35,7 +34,7 @@ if st.sidebar.button("Cadastrar"):
         if novo_user in config["credentials"]["usernames"]:
             st.sidebar.error("Usuário já existe")
         else:
-            hashed = Hasher([nova_senha]).generate()[0]
+            hashed = stauth.Hasher([nova_senha]).generate()[0]
             config["credentials"]["usernames"][novo_user] = {
                 "name": novo_nome,
                 "password": hashed
