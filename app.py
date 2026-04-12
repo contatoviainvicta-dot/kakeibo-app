@@ -59,7 +59,7 @@ authenticator = stauth.Authenticate(
 
 nome, status, usuario = authenticator.login(
     "Login",
-    location="sidebar"
+    location="main"
 )
 
 if status is False:
@@ -71,7 +71,6 @@ if status is None:
     st.stop()
 
 authenticator.logout("Sair", "sidebar")
-
 st.success(f"Bem-vindo, {nome} 👋")
 
 # ----------------------------------------------------
