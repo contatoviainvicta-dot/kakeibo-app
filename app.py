@@ -50,7 +50,7 @@ if st.sidebar.button("Cadastrar"):
 # LOGIN
 # ----------------------------------------------------
 
- authenticator = stauth.Authenticate(
+authenticator = stauth.Authenticate(
     config["credentials"],
     config["cookie"]["name"],
     config["cookie"]["key"],
