@@ -2,6 +2,8 @@ import streamlit as st
 import random
 import pandas as pd
 import os
+import pandas as pd
+import os
 
 # ----------------------------------------------------
 # CONFIG
@@ -12,6 +14,20 @@ st.set_page_config(page_title="ClinicMind PRO", layout="centered")
 st.title("🩺 ClinicMind PRO")
 st.subheader("Treinador de Raciocínio Clínico")
 
+# ----------------------------------------------------
+# IDENTIFICAÇÃO DO JOGADOR
+# ----------------------------------------------------
+
+if "jogador" not in st.session_state:
+    st.session_state.jogador = ""
+
+if not st.session_state.jogador:
+    nome = st.text_input("Seu nome:")
+    if nome:
+        st.session_state.jogador = nome
+        st.rerun()
+    else:
+        st.stop()
 # ----------------------------------------------------
 # LOGIN NATIVO (STREAMLIT CLOUD)
 # ----------------------------------------------------
@@ -123,27 +139,48 @@ if st.session_state.respondido:
 # ----------------------------------------------------
 # FINALIZAÇÃO + RANKING
 # ----------------------------------------------------
+# ----------------------------------------------------
+# RANKING PERSISTENTE
+# ----------------------------------------------------
+
+if not os.path.exists("ranking.csv"):
+    pd.DataFrame(columns=["nome", "xp"]).to_csv("ranking.csv", index=False)
+# ----------------------------------------------------
+# RESULTADO & RANKING
+# ----------------------------------------------------
 
 if st.session_state.finalizado:
 
+    st.markdown("---")
+    st.header("📊 Resultado Final")
+
+    total = st.session_state.total
+    pontos = st.session_state.pontos
+    acuracia = (pontos / (total * 10)) * 100 if total > 0 else 0
+
+    st.metric("Casos respondidos", total)
+    st.metric("Pontuação", pontos)
+    st.metric("Acurácia", f"{acuracia:.1f}%")
+
+    # salva no ranking global
     df = pd.read_csv("ranking.csv")
 
     df = pd.concat([
         df,
         pd.DataFrame([{
-            "usuario": usuario,
+            "nome": st.session_state.jogador,
             "xp": st.session_state.xp
         }])
     ])
 
     df.to_csv("ranking.csv", index=False)
 
-    st.header("🏆 Ranking Global")
+    st.subheader("🏆 Ranking Global")
 
     top = df.sort_values("xp", ascending=False).head(10)
 
-    for i, row in top.iterrows():
-        st.write(f"{row['usuario']} — {row['xp']} XP")
+    for i, row in enumerate(top.itertuples(), 1):
+        st.write(f"{i}. {row.nome} — {row.xp} XP")
 
     if st.button("Reiniciar"):
         st.session_state.clear()
