@@ -57,10 +57,10 @@ authenticator = stauth.Authenticate(
     config["cookie"]["expiry_days"]
 )
 
-try:
-    nome, status, usuario = authenticator.login()
-except Exception:
-    nome, status, usuario = authenticator.login(location="main")
+nome, status, usuario = authenticator.login(
+    location="main",
+    key="login_form"
+)
 
 if status is False:
     st.error("Usuário ou senha incorretos")
@@ -70,7 +70,7 @@ if status is None:
     st.warning("Faça login para continuar")
     st.stop()
 
-authenticator.logout("Sair", "sidebar")
+authenticator.logout("Sair", "sidebar", key="logout_btn")
 st.success(f"Bem-vindo, {nome} 👋")
 
 # ----------------------------------------------------
