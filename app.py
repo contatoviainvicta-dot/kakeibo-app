@@ -49,7 +49,6 @@ if st.sidebar.button("Cadastrar"):
 # ----------------------------------------------------
 # LOGIN
 # ----------------------------------------------------
-
 authenticator = stauth.Authenticate(
     config["credentials"],
     config["cookie"]["name"],
@@ -57,7 +56,9 @@ authenticator = stauth.Authenticate(
     config["cookie"]["expiry_days"]
 )
 
-nome, status, usuario = authenticator.login("Login", "main")
+nome, status, usuario = authenticator.login(
+    location="main"
+)
 
 if status is False:
     st.error("Usuário ou senha incorretos")
@@ -69,6 +70,7 @@ if status is None:
 
 authenticator.logout("Sair", "sidebar")
 st.success(f"Bem-vindo, {nome} 👋")
+
 
 # ----------------------------------------------------
 # RANKING GLOBAL
