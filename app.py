@@ -58,7 +58,6 @@ authenticator = stauth.Authenticate(
 )
 
 nome, status, usuario = authenticator.login(
-    "Login",
     location="main"
 )
 
