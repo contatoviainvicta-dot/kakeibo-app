@@ -2,10 +2,6 @@ import streamlit as st
 import random
 import pandas as pd
 import os
-import yaml
-from yaml.loader import SafeLoader
-import streamlit_authenticator as stauth
-import bcrypt
 
 # ----------------------------------------------------
 # CONFIG
@@ -13,103 +9,54 @@ import bcrypt
 
 st.set_page_config(page_title="ClinicMind PRO", layout="centered")
 
-# ----------------------------------------------------
-# CARREGAR USUÁRIOS
-# ----------------------------------------------------
-
-with open("users.yaml") as file:
-    config = yaml.load(file, Loader=SafeLoader)
+st.title("🩺 ClinicMind PRO")
+st.subheader("Treinador de Raciocínio Clínico")
 
 # ----------------------------------------------------
-# CADASTRO DE USUÁRIO
-# ----------------------------------------------------
-# ----------------------------------------------------
-# CADASTRO DE USUÁRIO
+# LOGIN NATIVO (STREAMLIT CLOUD)
 # ----------------------------------------------------
 
-if st.sidebar.button("Cadastrar"):
-    if novo_user and nova_senha:
-        if novo_user in config["credentials"]["usernames"]:
-            st.sidebar.error("Usuário já existe")
-        else:
-            hashed = bcrypt.hashpw(
-                nova_senha.encode(),
-                bcrypt.gensalt()
-            ).decode()
-
-            config["credentials"]["usernames"][novo_user] = {
-                "name": novo_nome,
-                "password": hashed
-            }
-
-            with open("users.yaml", "w") as file:
-                yaml.dump(config, file)
-
-            st.sidebar.success("Conta criada! Faça login.")
-    else:
-        st.sidebar.warning("Preencha todos os campos")
-
-
-# ----------------------------------------------------
-# LOGIN
-# ----------------------------------------------------
-authenticator = stauth.Authenticate(
-    config["credentials"],
-    config["cookie"]["name"],
-    config["cookie"]["key"],
-    config["cookie"]["expiry_days"]
-)
-
-nome, status, usuario = authenticator.login(
-    location="main"
-)
-
-if status is False:
-    st.error("Usuário ou senha incorretos")
+if not st.experimental_user:
+    st.warning("Faça login no Streamlit para continuar.")
     st.stop()
 
-if status is None:
-    st.warning("Faça login para continuar")
-    st.stop()
-
-authenticator.logout("Sair", "sidebar")
-st.success(f"Bem-vindo, {nome} 👋")
-
+usuario = st.experimental_user.get("email", "desconhecido")
+st.success(f"Logado como: {usuario}")
 
 # ----------------------------------------------------
 # RANKING GLOBAL
 # ----------------------------------------------------
 
 if not os.path.exists("ranking.csv"):
-    pd.DataFrame(columns=["usuario","xp"]).to_csv("ranking.csv", index=False)
+    pd.DataFrame(columns=["usuario", "xp"]).to_csv("ranking.csv", index=False)
 
 # ----------------------------------------------------
 # BANCO DE CASOS
 # ----------------------------------------------------
 
 base_casos = [
-("Dor torácica opressiva.", ["IAM","Ansiedade","DRGE","Pneumonia"], "IAM","Síndrome coronariana.","HEART"),
-("Dispneia e edema.", ["ICC","TEP","Asma","DPOC"], "ICC","Insuficiência cardíaca.","Framingham"),
-("Déficit neurológico súbito.", ["AVC","Tumor","Epilepsia","Enxaqueca"], "AVC","Evento vascular.","NIHSS"),
-("Febre e rigidez de nuca.", ["Meningite","AVC","Enxaqueca","Tumor"], "Meningite","Infecção SNC.","Punção"),
+    ("Dor torácica opressiva.", ["IAM","Ansiedade","DRGE","Pneumonia"], "IAM","Síndrome coronariana."),
+    ("Dispneia e edema.", ["ICC","TEP","Asma","DPOC"], "ICC","Insuficiência cardíaca."),
+    ("Déficit neurológico súbito.", ["AVC","Tumor","Epilepsia","Enxaqueca"], "AVC","Evento vascular."),
+    ("Febre e rigidez de nuca.", ["Meningite","AVC","Enxaqueca","Tumor"], "Meningite","Infecção SNC."),
 ]
 
 casos = []
-idades = [30,45,60,70]
-sexos = ["Homem","Mulher"]
-contextos = ["há 3 dias.","súbito hoje.","progressivo."]
 
-for i in range(200):
-    b = random.choice(base_casos)
-    ops = b[1].copy()
-    random.shuffle(ops)
+idades = [30, 45, 60, 70]
+sexos = ["Homem", "Mulher"]
+contextos = ["há 3 dias.", "súbito hoje.", "progressivo."]
+
+for _ in range(200):
+    base = random.choice(base_casos)
+    opcoes = base[1].copy()
+    random.shuffle(opcoes)
 
     casos.append({
-        "enunciado": f"{random.choice(sexos)}, {random.choice(idades)} anos, {b[0]} {random.choice(contextos)}",
-        "opcoes": ops,
-        "correta": b[2],
-        "explicacao": b[3],
-        "score": b[4]
+        "enunciado": f"{random.choice(sexos)}, {random.choice(idades)} anos, {base[0]} {random.choice(contextos)}",
+        "opcoes": opcoes,
+        "correta": base[2],
+        "explicacao": base[3]
     })
 
 # ----------------------------------------------------
@@ -131,22 +78,24 @@ if "finalizado" not in st.session_state:
 # PROGRESSO
 # ----------------------------------------------------
 
-st.progress(min(st.session_state.total/20,1.0))
-st.caption(f"⭐ XP: {st.session_state.xp}")
+st.progress(min(st.session_state.total / 20, 1.0))
+st.caption(f"⭐ XP atual: {st.session_state.xp}")
 
 # ----------------------------------------------------
-# CASO
+# CASO CLÍNICO
 # ----------------------------------------------------
 
 caso = st.session_state.caso
+st.markdown("---")
 st.write(caso["enunciado"])
 
-resposta = st.radio("Resposta:", caso["opcoes"])
+resposta = st.radio("Qual o diagnóstico mais provável?", caso["opcoes"])
 
 if not st.session_state.respondido:
     if st.button("Responder"):
         st.session_state.total += 1
         st.session_state.respondido = True
+
         if resposta == caso["correta"]:
             st.session_state.xp += 10
             st.success("Correto! +10 XP")
@@ -158,14 +107,17 @@ if not st.session_state.respondido:
 # ----------------------------------------------------
 
 if st.session_state.respondido:
+    st.info(f"Resposta correta: {caso['correta']}")
     st.write(caso["explicacao"])
 
-    if st.button("Próximo"):
+    col1, col2 = st.columns(2)
+
+    if col1.button("Próximo caso"):
         st.session_state.caso = random.choice(casos)
         st.session_state.respondido = False
         st.rerun()
 
-    if st.button("Finalizar"):
+    if col2.button("Finalizar sessão"):
         st.session_state.finalizado = True
 
 # ----------------------------------------------------
@@ -186,10 +138,11 @@ if st.session_state.finalizado:
 
     df.to_csv("ranking.csv", index=False)
 
-    st.subheader("🏆 Ranking Global")
+    st.header("🏆 Ranking Global")
+
     top = df.sort_values("xp", ascending=False).head(10)
 
-    for _, row in top.iterrows():
+    for i, row in top.iterrows():
         st.write(f"{row['usuario']} — {row['xp']} XP")
 
     if st.button("Reiniciar"):
