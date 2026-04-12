@@ -22,6 +22,9 @@ with open("users.yaml") as file:
 # ----------------------------------------------------
 # CADASTRO DE USUÁRIO
 # ----------------------------------------------------
+# ----------------------------------------------------
+# CADASTRO DE USUÁRIO
+# ----------------------------------------------------
 
 st.sidebar.subheader("🆕 Criar conta")
 
@@ -47,6 +50,7 @@ if st.sidebar.button("Cadastrar"):
             st.sidebar.success("Conta criada! Faça login.")
     else:
         st.sidebar.warning("Preencha todos os campos")
+
 
 # ----------------------------------------------------
 # LOGIN
