@@ -1,17 +1,97 @@
 import streamlit as st
 import random
+import yaml
+from yaml.loader import SafeLoader
+import streamlit_authenticator as stauth
+from streamlit_authenticator import Hasher
 
 # ----------------------------------------------------
 # CONFIG
 # ----------------------------------------------------
 
 st.set_page_config(page_title="ClinicMind PRO", layout="centered")
+# ----------------------------------------------------
+# AUTENTICAÇÃO E CADASTRO
+# ----------------------------------------------------
 
-st.markdown("""
-# 🩺 ClinicMind PRO
-### 🧠 Treinador de Raciocínio Clínico
-""")
+with open("users.yaml") as file:
+    config = yaml.load(file, Loader=SafeLoader)
 
+# Cadastro de novo usuário
+st.sidebar.subheader("🆕 Criar conta")
+
+novo_user = st.sidebar.text_input("Usuário")
+novo_nome = st.sidebar.text_input("Nome completo")
+nova_senha = st.sidebar.text_input("Senha", type="password")
+
+if st.sidebar.button("Cadastrar"):
+    if novo_user and nova_senha:
+        if novo_user in config["credentials"]["usernames"]:
+            st.sidebar.error("Usuário já existe")
+        else:
+            hashed = Hasher([nova_senha]).generate()[0]
+            config["credentials"]["usernames"][novo_user] = {
+                "name": novo_nome,
+                "password": hashed
+            }
+            with open("users.yaml", "w") as f:
+                yaml.dump(config, f)
+            st.sidebar.success("Conta criada! Faça login.")
+    else:
+        st.sidebar.warning("Preencha todos os campos")
+
+# Login
+authenticator = stauth.Authenticate(
+    config["credentials"],
+    config["cookie"]["name"],
+    config["cookie"]["key"],
+    config["cookie"]["expiry_days"]
+)
+
+nome, status, usuario = authenticator.login("Login", "main")
+
+if status is False:
+    st.error("Usuário ou senha incorretos")
+    st.stop()
+
+if status is None:
+    st.warning("Faça login para continuar")
+    st.stop()
+
+authenticator.logout("Sair", "sidebar")
+st.success(f"Bem-vindo, {nome} 👋")
+# ----------------------------------------------------
+# AUTENTICAÇÃO E CADASTRO
+# ----------------------------------------------------
+
+with open("users.yaml") as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+# Cadastro de novo usuário
+st.sidebar.subheader("🆕 Criar conta")
+
+novo_user = st.sidebar.text_input("Usuário")
+novo_nome = st.sidebar.text_input("Nome completo")
+nova_senha = st.sidebar.text_input("Senha", type="password")
+
+if st.sidebar.button("Cadastrar"):
+    if novo_user and nova_senha:
+        if novo_user in config["credentials"]["usernames"]:
+            st.sidebar.error("Usuário já existe")
+        else:
+            hashed = Hasher([nova_senha]).generate()[0]
+            config["credentials"]["usernames"][novo_user] = {
+                "name": novo_nome,
+                "password": hashed
+            }
+            with open("users.yaml", "w") as f:
+                yaml.dump(config, f)
+            st.sidebar.success("Conta criada! Faça login.")
+    else:
+        st.sidebar.warning("Preencha todos os campos")
+
+# Log
+a
 # ----------------------------------------------------
 # BANCO BASE DE CASOS (CLÍNICA MÉDICA)
 # ----------------------------------------------------
