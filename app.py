@@ -16,11 +16,11 @@ st.subheader("Treinador de Raciocínio Clínico")
 # LOGIN NATIVO (STREAMLIT CLOUD)
 # ----------------------------------------------------
 
-if not st.experimental_user:
+if not st.user.is_logged_in:
     st.warning("Faça login no Streamlit para continuar.")
     st.stop()
 
-usuario = st.experimental_user.get("email", "desconhecido")
+usuario = st.user.email
 st.success(f"Logado como: {usuario}")
 
 # ----------------------------------------------------
