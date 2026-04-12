@@ -5,6 +5,7 @@ import os
 import yaml
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
+import bcrypt
 
 # ----------------------------------------------------
 # CONFIG
@@ -26,18 +27,15 @@ with open("users.yaml") as file:
 # CADASTRO DE USUÁRIO
 # ----------------------------------------------------
 
-st.sidebar.subheader("🆕 Criar conta")
-
-novo_user = st.sidebar.text_input("Novo usuário")
-novo_nome = st.sidebar.text_input("Nome completo")
-nova_senha = st.sidebar.text_input("Senha", type="password")
-
 if st.sidebar.button("Cadastrar"):
     if novo_user and nova_senha:
         if novo_user in config["credentials"]["usernames"]:
             st.sidebar.error("Usuário já existe")
         else:
-            hashed = stauth.Authenticate.hash_password(nova_senha)
+            hashed = bcrypt.hashpw(
+                nova_senha.encode(),
+                bcrypt.gensalt()
+            ).decode()
 
             config["credentials"]["usernames"][novo_user] = {
                 "name": novo_nome,
